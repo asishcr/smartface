@@ -5,6 +5,8 @@ import Navigation from './components/Navigation/Navigation';
 import Logo from './components/Logo/Logo'
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm'
 import Rank from './components/Rank/Rank'
+import SignIn from './components/SignIn/SignIn'
+import Register from './components/Register/Register'
 import './App.css'
 import Particles from 'react-particles-js';
 import  Clarifai from 'clarifai';
@@ -31,7 +33,9 @@ class App extends Component {
     this.state={
       input:'',
       imageUrl:'',
-      faceSentiment:''
+      faceSentiment:'',
+      route:'logIn',
+      isSignedIn:false
     }
   }
 
@@ -63,22 +67,41 @@ class App extends Component {
     .catch(err=> console.log(err));
   }
 
+  onRouteChange =(route)=>{
+    if (route ==='home'){
+      this.setState({isSignedIn:true})
+    }
+    else if (route ==='logout'){
+      this.setState({isSignedIn:false})
+    }
+    this.setState({route:route})
+  }
+
   render(){
     return (
       <div className="App">
         <Particles className='particles'
           params={particlesOptions}
         />
-        <Navigation/>
-        <Logo/>
-        <Rank/>
-        <ImageLinkForm 
-        onInputChange={this.onInputChange} 
-        onButtonSubmit={this.onButtonSubmit}
-        />
-        <FaceRecognition imageUrl={this.state.imageUrl} faceSentiment={this.state.faceSentiment}/>
+        <Navigation isSignedIn={this.state.isSignedIn} onRouteChange ={this.onRouteChange}/>
+        {
+          this.state.route==='home' 
+          ? <div>
+              <Logo/>
+              <Rank/>
+              <ImageLinkForm 
+              onInputChange={this.onInputChange} 
+              onButtonSubmit={this.onButtonSubmit}
+              />
+              <FaceRecognition imageUrl={this.state.imageUrl} faceSentiment={this.state.faceSentiment}/>
+             </div>
+          : (
+            this.state.route ==='logIn'
+            ? <SignIn onRouteChange ={this.onRouteChange}/>
+            : <Register onRouteChange ={this.onRouteChange}/>
+          )  
+        }
       </div>
-
     );
   }
 }
